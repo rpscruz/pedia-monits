@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pediatric Vitals Checker</title>
+    <style>
+        :root {
+            --primary: #89cff0; /* Baby Blue */
+            --primary-dark: #5dade2;
+            --danger: #ff9999; /* Soft Red */
+            --success: #b2e2f2; 
+            --accent: #fbcce7; /* Soft Pink */
+            --bg: #fdfbfb;
+            --text: #5a5a5a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f7f9fc;
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(137, 207, 240, 0.2);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 3px solid #f0f8ff;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #a0a0a0;
+            margin: 20px 0 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 1px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #777;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        input, select, textarea {
+            padding: 12px;
+            border: 2px solid #eef2f7;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background-color: #fcfdfe;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(137, 207, 240, 0.3);
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 15px;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .deranged { background-color: #fff1f1; border: 2px solid var(--danger); color: #d63031; }
+        .normal { background-color: #f0fdf9; border: 2px solid #a2dad0; color: #2d3436; }
+
+        .referral-output {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fafafa;
+            border: 2px dashed #e0e0e0;
+            border-radius: 12px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            background: #fff;
+            color: var(--primary-dark);
+            border: 1px solid var(--primary);
+            width: auto;
+            margin: 0;
+            border-radius: 8px;
+        }
+
+        .ett-info {
+            background: #fdf6ff;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #efe1f5;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #6c5ce7;
+        }
+
+        .o2-settings {
+            background: #fffdf2;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #fef5d4;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Reference Table Styling */
+        .ref-card {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            margin-top: 10px;
+        }
+
+        .ref-table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8fbff;
+            color: var(--primary-dark);
+            padding: 8px;
+            border-bottom: 2px solid #eef2f7;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafcfe;
+        }
+
+        /* Icon sizing */
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>
+        <svg class="icon" viewBox="0 0 24 24" style="width:28px; height:28px;"><path d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z M13,7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"/></svg>
+        Pediatric Vitals Checker
+    </h1>
+
+    <div class="input-group">
+        <label>
+            <svg class="icon" style="color:var(--primary-dark);" viewBox="0 0 24 24"><path d="M15,14C12.33,14,7,15.33,7,18v2H23V18C23,15.33,17.67,14,15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/></svg>
+            Patient Name List (one per line)
+        </label>
+        <textarea id="nameList" placeholder="John Doe&#10;Jane Smith" oninput="updateNameDropdown()"></textarea>
+    </div>
+
+    <div class="input-group" style="margin-top:15px;">
+        <label>Select Patient Name</label>
+        <select id="pNameDropdown">
+            <option value="">-- Select or type below --</option>
+        </select>
+        <input type="text" id="pNameManual" placeholder="Or type manually..." style="margin-top:5px;">
+    </div>
+
+    <div class="grid" style="margin-top:15px;">
+        <div class="input-group">
+            <label>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/></svg>
+                Age Category
+            </label>
+            <select id="ageRange" onchange="handleAgeChange()">
+                <option value="" disabled selected>Select age category</option>
+                <option value="premie">Premie</option>
+                <option value="0-3mo">0-3 months</option>
+                <option value="3-6mo">3-6 months</option>
+                <option value="6-12mo">6-12 months</option>
+                <option value="1-3yr">1-3 years</option>
+                <option value="3-6yr">3-6 years</option>
+                <option value="6-12yr">6-12 years</option>
+                <option value=">12yr">>12 years</option>
+            </select>
+        </div>
+        <div class="input-group" id="exactAgeContainer" style="display:none;">
+            <label>Exact Age (Years)</label>
+            <input type="number" id="exactAge" placeholder="For ETT">
+        </div>
+    </div>
+
+    <div class="section-title">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg>
+        Current Vitals
+    </div>
+    <div class="grid">
+        <div class="input-group">
+            <label>HR (bpm)</label>
+            <input type="number" id="vHR" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>RR (bpm)</label>
+            <input type="number" id="vRR" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>Systolic BP</label>
+            <input type="number" id="vSBP" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>Diastolic BP</label>
+            <input type="number" id="vDBP" placeholder="0">
+        </div>
+        <div class="input-group">
+            <label>Temp (°C)</label>
+            <input type="number" step="0.1" id="vTemp" value="37.0">
+        </div>
+        <div class="input-group">
+            <label>O2 Sat (%)</label>
+            <input type="number" id="vO2" value="98">
+        </div>
+    </div>
+
+    <div class="section-title">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"/></svg>
+        Oxygen Support
+    </div>
+    <div class="input-group">
+        <label>Delivery Method</label>
+        <select id="o2Method" onchange="toggleO2Settings()">
+            <option value="RA">RA (Room Air)</option>
+            <option value="NC">NC (Nasal Cannula)</option>
+            <option value="FM">FM (Face Mask)</option>
+            <option value="NRFM">NRFM (Non-rebreather Mask)</option>
+            <option value="HFNC">HFNC (High Flow Nasal Cannula)</option>
+            <option value="SPONT">SPONT (Ventilator - Spontaneous)</option>
+            <option value="SIMV">SIMV (Ventilator - SIMV)</option>
+            <option value="LC">LC (Ventilator - Low Compliance)</option>
+            <option value="A/C">A/C (Ventilator - Assist Control)</option>
+        </select>
+    </div>
+
+    <div id="lpmContainer" class="o2-settings">
+        <div class="input-group">
+            <label>Flow Rate (LPM)</label>
+            <input type="number" id="vLPM" placeholder="e.g. 2.0">
+        </div>
+    </div>
+
+    <div id="ventContainer" class="o2-settings">
+        <div class="grid">
+            <div class="input-group">
+                <label>FiO2 (%)</label>
+                <input type="number" id="vFiO2" placeholder="FiO2">
+            </div>
+            <div class="input-group">
+                <label>PEEP (cmH2O)</label>
+                <input type="number" id="vPEEP" placeholder="PEEP">
+            </div>
+        </div>
+    </div>
+
+    <button onclick="analyze()">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M10,17l-5-5l1.41-1.41L10,14.17l7.59-7.59L19,8L10,17z"/></svg>
+        Check Vitals & Calculate
+    </button>
+
+    <div id="resultPanel" class="result-panel"></div>
+    <div id="ettPanel" class="ett-info" style="display:none;"></div>
+
+    <div id="referralContainer" style="display:none;">
+        <div class="section-title">Referral Message</div>
+        <div class="referral-output" id="referralText"></div>
+        <button class="copy-btn" onclick="copyText()">Copy</button>
+    </div>
+</div>
+
+<div class="ref-card">
+    <div class="section-title">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H19C20.11,21 21,20.11 21,19V5C21,3.89 20.11,3 19,3M19,19H5V5H19V19M7,10H17V12H7V10M7,6H17V8H7V6M7,14H12V16H7V14Z"/></svg>
+        Reference Normal Ranges
+    </div>
+    <div class="ref-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Age</th>
+                    <th>HR</th>
+                    <th>RR</th>
+                    <th>SBP</th>
+                    <th>DBP</th>
+                </tr>
+            </thead>
+            <tbody id="refTableBody">
+                <!-- Populated by JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const vitalRanges = {
+        "premie": { label: "Premie", hr: [120, 170], rr: [40, 70], sbp: [55, 75], dbp: [35, 45] },
+        "0-3mo":  { label: "0-3 mo", hr: [100, 150], rr: [35, 55], sbp: [65, 85], dbp: [45, 55] },
+        "3-6mo":  { label: "3-6 mo", hr: [90, 120],  rr: [30, 45], sbp: [70, 90], dbp: [50, 65] },
+        "6-12mo": { label: "6-12 mo", hr: [80, 120],  rr: [25, 40], sbp: [80, 100], dbp: [55, 65] },
+        "1-3yr":  { label: "1-3 yr", hr: [70, 110],  rr: [20, 30], sbp: [90, 105], dbp: [55, 70] },
+        "3-6yr":  { label: "3-6 yr", hr: [65, 110],  rr: [20, 25], sbp: [95, 110], dbp: [60, 75] },
+        "6-12yr": { label: "6-12 yr", hr: [60, 95],   rr: [14, 22], sbp: [100, 120], dbp: [60, 75] },
+        ">12yr":  { label: ">12 yr", hr: [55, 85],   rr: [12, 18], sbp: [110, 135], dbp: [65, 85] }
+    };
+
+    // Populate Reference Table
+    const tbody = document.getElementById('refTableBody');
+    Object.values(vitalRanges).forEach(range => {
+        const row = `<tr>
+            <td><strong>${range.label}</strong></td>
+            <td>${range.hr[0]}-${range.hr[1]}</td>
+            <td>${range.rr[0]}-${range.rr[1]}</td>
+            <td>${range.sbp[0]}-${range.sbp[1]}</td>
+            <td>${range.dbp[0]}-${range.dbp[1]}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+    });
+
+    function updateNameDropdown() {
+        const text = document.getElementById('nameList').value;
+        const dropdown = document.getElementById('pNameDropdown');
+        const names = text.split('\n').map(n => n.trim()).filter(n => n !== "");
+        
+        const currentVal = dropdown.value;
+        
+        dropdown.innerHTML = '<option value="">-- Select Name --</option>';
+        names.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            dropdown.appendChild(opt);
+        });
+
+        if (names.includes(currentVal)) {
+            dropdown.value = currentVal;
+        }
+    }
+
+    function handleAgeChange() {
+        const val = document.getElementById('ageRange').value;
+        const container = document.getElementById('exactAgeContainer');
+        
+        if (val.includes('yr')) {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+
+        const ref = vitalRanges[val];
+        if (ref) {
+            document.getElementById('vHR').value = Math.round((ref.hr[0] + ref.hr[1]) / 2);
+            document.getElementById('vRR').value = Math.round((ref.rr[0] + ref.rr[1]) / 2);
+            document.getElementById('vSBP').value = Math.round((ref.sbp[0] + ref.sbp[1]) / 2);
+            document.getElementById('vDBP').value = Math.round((ref.dbp[0] + ref.dbp[1]) / 2);
+        }
+    }
+
+    function toggleO2Settings() {
+        const method = document.getElementById('o2Method').value;
+        const lpmCont = document.getElementById('lpmContainer');
+        const ventCont = document.getElementById('ventContainer');
+        lpmCont.style.display = 'none';
+        ventCont.style.display = 'none';
+
+        if (['NC', 'FM', 'NRFM', 'HFNC'].includes(method)) {
+            lpmCont.style.display = 'block';
+        } else if (['SPONT', 'SIMV', 'LC', 'A/C'].includes(method)) {
+            ventCont.style.display = 'block';
+        }
+    }
+
+    function analyze() {
+        const dropdownName = document.getElementById('pNameDropdown').value;
+        const manualName = document.getElementById('pNameManual').value;
+        const name = dropdownName || manualName || "NAME";
+        
+        const ageCat = document.getElementById('ageRange').value;
+        
+        if (!ageCat) {
+            alert("Please select an age category first.");
+            return;
+        }
+
+        const hr = parseInt(document.getElementById('vHR').value);
+        const rr = parseInt(document.getElementById('vRR').value);
+        const sbp = parseInt(document.getElementById('vSBP').value);
+        const dbp = parseInt(document.getElementById('vDBP').value);
+        const temp = parseFloat(document.getElementById('vTemp').value);
+        const o2 = parseInt(document.getElementById('vO2').value);
+        const exactAge = parseFloat(document.getElementById('exactAge').value);
+        
+        const o2Method = document.getElementById('o2Method').value;
+        const lpm = document.getElementById('vLPM').value;
+        const fio2 = document.getElementById('vFiO2').value;
+        const peep = document.getElementById('vPEEP').value;
+
+        let o2String = o2Method;
+        if (['NC', 'FM', 'NRFM', 'HFNC'].includes(o2Method) && lpm) {
+            o2String = `${o2Method} @ ${lpm} LPM`;
+        } else if (['SPONT', 'SIMV', 'LC', 'A/C'].includes(o2Method)) {
+            o2String = `${o2Method} ${fio2 || '--'}/${peep || '--'}`;
+        }
+
+        if (isNaN(hr) || isNaN(rr) || isNaN(sbp) || isNaN(dbp)) {
+            alert("Please fill in the core vital signs.");
+            return;
+        }
+
+        const ref = vitalRanges[ageCat];
+        let issues = [];
+
+        const isHrDeranged = hr > ref.hr[1] || hr < ref.hr[0];
+        const isRrDeranged = rr > ref.rr[1] || rr < ref.rr[0];
+        const isSbpDeranged = sbp < ref.sbp[0] || sbp > ref.sbp[1];
+        const isTempDeranged = temp >= 37.7;
+        const isO2Deranged = o2 < 95;
+
+        if (hr > ref.hr[1]) issues.push("tachycardia");
+        if (hr < ref.hr[0]) issues.push("bradycardia");
+        if (rr > ref.rr[1]) issues.push("tachypnea");
+        if (rr < ref.rr[0]) issues.push("bradypnea");
+        if (sbp > ref.sbp[1]) issues.push("hypertension");
+        if (sbp < ref.sbp[0]) issues.push("hypotension");
+        if (isTempDeranged) issues.push("fever");
+        if (isO2Deranged) issues.push("desaturations");
+
+        const resultPanel = document.getElementById('resultPanel');
+        resultPanel.style.display = "block";
+
+        if (issues.length > 0) {
+            resultPanel.className = "result-panel deranged";
+            resultPanel.innerHTML = `⚠️ Deranged: ${issues.join(", ")}`;
+            document.getElementById('referralContainer').style.display = 'block';
+            
+            const vitalLines = [
+                { text: `HR ${hr}${isHrDeranged ? '❗️' : ''}`, isDeranged: isHrDeranged },
+                { text: `RR ${rr}${isRrDeranged ? '❗️' : ''}`, isDeranged: isRrDeranged },
+                { text: `BP ${sbp}/${dbp}${isSbpDeranged ? '❗️' : ''}`, isDeranged: isSbpDeranged },
+                { text: `T ${temp || '--'}${isTempDeranged ? '❗️' : ''}`, isDeranged: isTempDeranged },
+                { text: `O2 ${o2 || '--'}% ${o2String}${isO2Deranged ? '❗️' : ''}`, isDeranged: isO2Deranged }
+            ];
+
+            vitalLines.sort((a, b) => (a.isDeranged === b.isDeranged ? 0 : a.isDeranged ? -1 : 1));
+
+            const referralText = `Respectfully referring ${name.toUpperCase()} for ${issues.join(", ")}
+
+${vitalLines.map(line => line.text).join('\n')}
+
+Thank you po!`;
+            document.getElementById('referralText').innerText = referralText;
+        } else {
+            resultPanel.className = "result-panel normal";
+            resultPanel.innerHTML = `✅ Vitals normal for ${ageCat}`;
+            document.getElementById('referralContainer').style.display = 'none';
+        }
+
+        const ettPanel = document.getElementById('ettPanel');
+        if (!isNaN(exactAge) && exactAge >= 1) {
+            const uncuffed = (exactAge / 4) + 4;
+            const cuffed = (exactAge / 4) + 3;
+            const depth = uncuffed * 3;
+            ettPanel.style.display = "block";
+            ettPanel.innerHTML = `<strong>ETT Formulas:</strong><br>
+                Uncuffed: ${uncuffed.toFixed(1)} mm | Cuffed: ${cuffed.toFixed(1)} mm<br>
+                Depth: ${depth.toFixed(1)} cm`;
+        } else {
+            ettPanel.style.display = "none";
+        }
+    }
+
+    function copyText() {
+        const text = document.getElementById('referralText').innerText;
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert("Referral copied!");
+    }
+</script>
+
+</body>
+</html>
