@@ -32,10 +32,12 @@
 
         .tab-btn {
             flex: 1; padding: 12px; border: none; background: #eef2f7; border-radius: 12px;
-            cursor: pointer; font-weight: 600; color: #777; transition: 0.2s; font-size: 0.9rem;
+            cursor: pointer; font-weight: 600; color: #777; transition: 0.2s; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
         }
 
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(137, 207, 240, 0.3); }
+        .tab-btn svg { width: 1.1em; height: 1.1em; fill: currentColor; vertical-align: middle; }
 
         .card {
             background: white; width: 100%; max-width: 650px; padding: 20px; border-radius: 20px;
@@ -48,13 +50,15 @@
         h1 {
             font-size: 1.4rem; color: var(--primary-dark); margin-bottom: 15px; text-align: center;
             border-bottom: 2px solid #f0f8ff; padding-bottom: 10px; display: flex; align-items: center;
-            justify-content: center; gap: 8px;
+            justify-content: center; gap: 10px;
         }
+        h1 svg { width: 1.2em; height: 1.2em; fill: var(--primary-dark); }
 
         .section-title {
             font-size: 0.8rem; text-transform: uppercase; color: #a0a0a0; margin: 15px 0 8px;
-            font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px;
+            font-weight: 700; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px;
         }
+        .section-title svg { width: 1.1em; height: 1.1em; fill: #cbd5e0; }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 
@@ -73,14 +77,16 @@
             box-shadow: 0 4px 12px rgba(137, 207, 240, 0.25); transition: 0.2s; display: flex;
             align-items: center; justify-content: center; gap: 8px;
         }
+        button.main-btn svg { width: 1.1em; height: 1.1em; fill: white; }
 
         button.main-btn:hover { background-color: var(--primary-dark); }
         
         button.secondary-btn {
             width: 100%; padding: 10px; background-color: white; color: var(--primary-dark); border: 2px solid var(--primary);
             border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; margin-top: 10px;
-            transition: 0.2s;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
+        button.secondary-btn svg { width: 1.1em; height: 1.1em; fill: currentColor; }
 
         .result-panel {
             margin-top: 15px; padding: 12px; border-radius: 12px; display: none;
@@ -94,6 +100,14 @@
             margin-top: 12px; padding: 12px; background: #fafafa; border: 1px dashed #e0e0e0;
             border-radius: 10px; font-family: "Courier New", Courier, monospace; font-size: 0.85rem;
             white-space: pre-wrap;
+        }
+
+        .patient-group {
+            margin-bottom: 25px;
+        }
+
+        .patient-header {
+            font-weight: bold; color: var(--primary-dark); font-size: 0.95rem; border-bottom: 1px solid #eef2f7; padding-bottom: 5px; margin-bottom: 10px;
         }
 
         .history-item {
@@ -112,7 +126,6 @@
             border: 2px solid var(--primary); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        /* Specific styling for the clickable height value */
         .height-highlight {
             font-weight: bold; color: var(--primary-dark); cursor: pointer; border-bottom: 1px dashed var(--primary-dark);
         }
@@ -171,6 +184,38 @@
             border-top: 1px dashed #eef2f7;
         }
 
+        /* History Sub-Tabs */
+        .sub-tabs {
+            display: flex;
+            background: #f0f4f8;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .sub-tab-btn {
+            flex: 1; border: none; background: transparent; padding: 8px;
+            font-size: 0.75rem; font-weight: 600; color: #777; cursor: pointer;
+            border-radius: 8px; transition: 0.2s;
+        }
+        .sub-tab-btn.active {
+            background: white; color: var(--primary-dark); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .history-table-wrapper {
+            width: 100%; overflow-x: auto;
+        }
+        .history-table {
+            width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 600px;
+        }
+        .history-table th, .history-table td {
+            text-align: left; padding: 10px; border-bottom: 1px solid #eef2f7;
+        }
+        .history-table th { background: #f8fafc; color: #777; }
+        .vital-tag {
+            padding: 2px 4px; border-radius: 4px; background: #f0f4f8; font-weight: bold;
+        }
+        .vital-tag.alert { color: #d63031; background: #fff1f1; }
+
         .footer-references {
             margin-top: 30px; padding: 20px; border-top: 1px solid #eef2f7;
             width: 100%; max-width: 650px; font-size: 0.75rem; color: #a0a0a0;
@@ -183,13 +228,25 @@
 <body>
 
 <div class="tabs">
-    <button class="tab-btn active" id="btn-vitals" onclick="switchTab('vitals')">Vitals Checker</button>
-    <button class="tab-btn" id="btn-history" onclick="switchTab('history')">History</button>
-    <button class="tab-btn" id="btn-bp" onclick="switchTab('bp-calc')">AHA BP (Pedz.de)</button>
+    <button class="tab-btn active" id="btn-vitals" onclick="switchTab('vitals')">
+        <svg viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.1 3.89,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19M11.5,17H12.5V11.5H11.5V17M11.5,9H12.5V7H11.5V9Z" /></svg>
+        Checker
+    </button>
+    <button class="tab-btn" id="btn-history" onclick="switchTab('history')">
+        <svg viewBox="0 0 24 24"><path d="M13.5,8H12V13L16.28,15.54L17,14.33L13.5,12.25V8M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.22 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z" /></svg>
+        History
+    </button>
+    <button class="tab-btn" id="btn-bp" onclick="switchTab('bp-calc')">
+        <svg viewBox="0 0 24 24"><path d="M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M15,12H17V17H12V15H15V12M7,7H12V9H9V12H7V7Z" /></svg>
+        AHA BP
+    </button>
 </div>
 
 <div id="vitals-tab" class="tab-content active card">
-    <h1>Vitals Checker</h1>
+    <h1>
+        <svg viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg>
+        Vitals Checker
+    </h1>
 
     <div class="input-group">
         <label>Name List (one per line or comma separated)</label>
@@ -207,7 +264,10 @@
         </div>
     </div>
 
-    <div class="section-title">Age & Height</div>
+    <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>
+        Age & Height
+    </div>
     <div class="grid">
         <div class="input-group"><label>Years</label><input type="number" id="ageYears" value="0" oninput="handleAgeChange()"></div>
         <div class="input-group"><label>Months</label><input type="number" id="ageMonths" value="0" max="11" oninput="handleAgeChange()"></div>
@@ -218,7 +278,10 @@
         </div>
     </div>
 
-    <div class="section-title">Current Vitals</div>
+    <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M13,7.5H18V9.5H13V7.5M13,14.5H18V16.5H13V14.5M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,19H5V5H19V19M11,17H6V15H11V17M11,13H6V11H11V13M11,9H6V7H11V9Z" /></svg>
+        Current Vitals
+    </div>
     <div class="grid">
         <div class="input-group"><label>HR</label><input type="number" id="vHR"></div>
         <div class="input-group"><label>RR</label><input type="number" id="vRR"></div>
@@ -263,7 +326,10 @@
         </div>
     </div>
 
-    <div class="section-title">BP Classification (Override)</div>
+    <div class="section-title">
+        <svg viewBox="0 0 24 24"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" /></svg>
+        BP Classification (Override)
+    </div>
     <div class="input-group">
         <label>Classify BP status (based on AHA/Pedz)</label>
         <select id="bpOverride">
@@ -274,21 +340,36 @@
         </select>
     </div>
 
-    <button class="main-btn" onclick="analyze()">Check Vitals</button>
+    <button class="main-btn" onclick="analyze()">
+        <svg viewBox="0 0 24 24"><path d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5Z" /></svg>
+        Check Vitals
+    </button>
 
     <div id="resultPanel" class="result-panel"></div>
     
     <div id="referralContainer" style="display:none;">
-        <div class="section-title">Referral Message</div>
+        <div class="section-title">
+            <svg viewBox="0 0 24 24"><path d="M20,2H4C2.89,2 2,2.89 2,4V16C2,17.11 2.89,18 4,18H18L22,22V4C22,2.89 21.11,2 20,2M20,16H4V4H20V16Z" /></svg>
+            Referral Message
+        </div>
         <div class="referral-output" id="referralText"></div>
         <div class="grid">
-            <button class="main-btn" onclick="copyReferral()">Copy Message</button>
-            <button class="secondary-btn" onclick="saveToHistory()">Save to History</button>
+            <button class="main-btn" onclick="copyReferral()">
+                <svg viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
+                Copy Message
+            </button>
+            <button class="secondary-btn" onclick="saveToHistory()">
+                <svg viewBox="0 0 24 24"><path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z" /></svg>
+                Save to History
+            </button>
         </div>
     </div>
 
     <div id="hlPanel" class="info-panel">
-        <div style="font-weight:bold; margin-bottom:5px; color: #6c5ce7; font-size: 0.85rem;">Pediatric Parameters & Equipment Reference (PALS/JH):</div>
+        <div style="font-weight:bold; margin-bottom:5px; color: #6c5ce7; font-size: 0.85rem; display:flex; align-items:center; gap:5px;">
+            <svg style="width:1.1em; height:1.1em; fill:#6c5ce7;" viewBox="0 0 24 24"><path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>
+            Pediatric Parameters & Equipment Reference:
+        </div>
         <div class="hl-table-wrapper">
             <table class="hl-table">
                 <thead>
@@ -321,15 +402,33 @@
 </div>
 
 <div id="history-tab" class="tab-content card">
-    <h1>Patient History</h1>
+    <h1>
+        <svg viewBox="0 0 24 24"><path d="M13,3A9,9 0 0,0 4,12H1L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.22 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z" /></svg>
+        Patient History
+    </h1>
+
+    <div class="sub-tabs">
+        <button class="sub-tab-btn active" id="sub-btn-messages" onclick="switchHistoryView('messages')">Messages</button>
+        <button class="sub-tab-btn" id="sub-btn-table" onclick="switchHistoryView('table')">Table View</button>
+    </div>
+
     <div id="historyList">
         <p style="text-align:center; color:#a0a0a0; font-size:0.9rem;">No saved records for this session.</p>
     </div>
-    <button class="secondary-btn" style="color:#d63031; border-color:#ff9999;" onclick="clearHistory()">Clear All</button>
+
+    <button class="secondary-btn" style="color:#d63031; border-color:#ff9999; margin-top: 20px;" onclick="clearHistory()">
+        <svg viewBox="0 0 24 24" style="fill:#d63031;"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19V4M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>
+        Clear All
+    </button>
 </div>
 
 <div id="bp-tab" class="tab-content card">
-    <div class="bp-header"><h1>BP Reference (AHA)</h1></div>
+    <div class="bp-header">
+        <h1>
+            <svg viewBox="0 0 24 24"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" /></svg>
+            BP Reference (AHA)
+        </h1>
+    </div>
     <div class="external-box">
         <p style="font-size: 0.8rem; color: #555; margin: 0;">Tap values to copy for Pedz.de:</p>
         <div id="birthDateDisplay" class="date-highlight" onclick="copyBirthDate()">01.01.2024</div>
@@ -350,8 +449,8 @@
 <div id="toast" class="toast">Copied!</div>
 
 <script>
-    // Internal state
     let patientHistory = [];
+    let currentHistoryView = 'messages';
     let calculatedDateStr = "";
 
     const vitalRanges = [
@@ -406,6 +505,14 @@
         }
     }
 
+    function switchHistoryView(view) {
+        currentHistoryView = view;
+        document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+        if(view === 'messages') document.getElementById('sub-btn-messages').classList.add('active');
+        else document.getElementById('sub-btn-table').classList.add('active');
+        renderHistory();
+    }
+
     function updateBPDisplay() {
         document.getElementById('heightDisplay').innerText = (document.getElementById('pHeight').value || "100");
         updateCalculatedBirthDate();
@@ -444,7 +551,8 @@
     }
 
     function analyze() {
-        const name = document.getElementById('pNameDropdown').value || document.getElementById('pNameManual').value || "PATIENT";
+        const nameInput = document.getElementById('pNameDropdown').value || document.getElementById('pNameManual').value || "PATIENT";
+        const name = nameInput.trim();
         const hr = parseInt(document.getElementById('vHR').value);
         const rr = parseInt(document.getElementById('vRR').value);
         const sbp = parseInt(document.getElementById('vSBP').value);
@@ -521,14 +629,25 @@
             : `Respectfully relaying latest vitals of ${name.toUpperCase()}`;
             
         document.getElementById('referralText').innerText = `${referralHeader}\n\n${vitalLines.join('\n')}\n\nThank you po!`;
+
+        window._lastResult = {
+            name, hr, hrDeranged: hrObj.isDeranged,
+            rr, rrDeranged: rrObj.isDeranged,
+            sbp, dbp, bpDeranged: bpObj.isDeranged,
+            temp: tempValue, tempDeranged: tObj.isDeranged,
+            o2: o2sat, o2Deranged: o2Obj.isDeranged,
+            o2src, issues,
+            rawTimestamp: Date.now()
+        };
     }
 
     function saveToHistory() {
-        const name = document.getElementById('pNameDropdown').value || document.getElementById('pNameManual').value || "Unknown";
+        const res = window._lastResult;
+        if (!res) return;
         const referralText = document.getElementById('referralText').innerText;
         const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         
-        patientHistory.unshift({ name, referralText, timestamp });
+        patientHistory.push({ ...res, referralText, timestamp });
         showToast("Saved to history!");
     }
 
@@ -538,16 +657,75 @@
             container.innerHTML = '<p style="text-align:center; color:#a0a0a0; font-size:0.9rem;">No saved records for this session.</p>';
             return;
         }
-        container.innerHTML = patientHistory.map((item, index) => `
-            <div class="history-item">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <strong>${item.name}</strong>
-                    <span style="color:#a0a0a0;">${item.timestamp}</span>
-                </div>
-                <div style="white-space:pre-wrap; font-size:0.75rem; color:#666;">${item.referralText}</div>
-                <button class="secondary-btn" style="padding:4px; margin-top:5px; font-size:0.7rem;" onclick="copyToClipboard(patientHistory[${index}].referralText, 'Referral copied!')">Copy Again</button>
-            </div>
-        `).join('');
+
+        // Grouping logic
+        const groups = {};
+        patientHistory.forEach(item => {
+            if (!groups[item.name]) groups[item.name] = [];
+            groups[item.name].push(item);
+        });
+
+        // Sorting: Each group internal sort by timestamp (later at bottom)
+        Object.keys(groups).forEach(name => {
+            groups[name].sort((a, b) => a.rawTimestamp - b.rawTimestamp);
+        });
+
+        let html = '';
+
+        if (currentHistoryView === 'messages') {
+            Object.keys(groups).forEach(name => {
+                html += `<div class="patient-group">
+                    <div class="patient-header">${name.toUpperCase()}</div>
+                    ${groups[name].map(item => `
+                        <div class="history-item">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                <span style="font-weight:600;">Record</span>
+                                <span style="color:#a0a0a0; font-size:0.7rem;">${item.timestamp}</span>
+                            </div>
+                            <div style="white-space:pre-wrap; font-size:0.75rem; color:#666;">${item.referralText}</div>
+                            <button class="secondary-btn" style="padding:4px; margin-top:5px; font-size:0.7rem; width:auto;" onclick="copyToClipboard(\`${item.referralText.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, 'Referral copied!')">
+                                <svg viewBox="0 0 24 24"><path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" /></svg>
+                                Copy Again
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>`;
+            });
+        } else {
+            Object.keys(groups).forEach(name => {
+                html += `<div class="patient-group">
+                    <div class="patient-header">${name.toUpperCase()}</div>
+                    <div class="history-table-wrapper">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>HR</th>
+                                    <th>RR</th>
+                                    <th>BP</th>
+                                    <th>T</th>
+                                    <th>O2</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${groups[name].map(item => `
+                                    <tr>
+                                        <td>${item.timestamp}</td>
+                                        <td><span class="vital-tag ${item.hrDeranged ? 'alert' : ''}">${item.hr}</span></td>
+                                        <td><span class="vital-tag ${item.rrDeranged ? 'alert' : ''}">${item.rr}</span></td>
+                                        <td><span class="vital-tag ${item.bpDeranged ? 'alert' : ''}">${item.sbp}/${item.dbp}</span></td>
+                                        <td><span class="vital-tag ${item.tempDeranged ? 'alert' : ''}">${item.temp.toFixed(1)}</span></td>
+                                        <td><span class="vital-tag ${item.o2Deranged ? 'alert' : ''}">${item.o2}% (${item.o2src})</span></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>`;
+            });
+        }
+
+        container.innerHTML = html;
     }
 
     function clearHistory() {
