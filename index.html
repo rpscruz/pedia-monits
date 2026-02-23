@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pediatric Vitals Checker</title>
+    <title>Pediatric Vitals Checker & BP Reference</title>
     <style>
         :root {
             --primary: #89cff0; /* Baby Blue */
@@ -11,545 +11,566 @@
             --danger: #ff9999; /* Soft Red */
             --success: #b2e2f2; 
             --accent: #fbcce7; /* Soft Pink */
-            --bg: #fdfbfb;
+            --bg: #f7f9fc;
             --text: #5a5a5a;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f7f9fc;
+            background-color: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .card {
-            background: white;
-            width: 100%;
-            max-width: 500px;
-            padding: 24px;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(137, 207, 240, 0.2);
-            margin-bottom: 20px;
-            position: relative;
-            box-sizing: border-box;
+        .tabs {
+            display: flex; gap: 8px; margin-bottom: 15px; width: 100%; max-width: 650px;
         }
 
+        .tab-btn {
+            flex: 1; padding: 12px; border: none; background: #eef2f7; border-radius: 12px;
+            cursor: pointer; font-weight: 600; color: #777; transition: 0.2s; font-size: 0.9rem;
+        }
+
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(137, 207, 240, 0.3); }
+
+        .card {
+            background: white; width: 100%; max-width: 650px; padding: 20px; border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(137, 207, 240, 0.15); margin-bottom: 20px; box-sizing: border-box;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
         h1 {
-            font-size: 1.6rem;
-            color: var(--primary-dark);
-            margin-bottom: 20px;
-            text-align: center;
-            border-bottom: 3px solid #f0f8ff;
-            padding-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            font-size: 1.4rem; color: var(--primary-dark); margin-bottom: 15px; text-align: center;
+            border-bottom: 2px solid #f0f8ff; padding-bottom: 10px; display: flex; align-items: center;
+            justify-content: center; gap: 8px;
         }
 
         .section-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            color: #a0a0a0;
-            margin: 20px 0 10px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            letter-spacing: 1px;
+            font-size: 0.8rem; text-transform: uppercase; color: #a0a0a0; margin: 15px 0 8px;
+            font-weight: 700; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+        .input-group { display: flex; flex-direction: column; gap: 4px; }
 
-        label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #777;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        label { font-size: 0.75rem; font-weight: 600; color: #777; }
 
         input, select, textarea {
-            padding: 12px;
-            border: 2px solid #eef2f7;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: all 0.2s;
-            background-color: #fcfdfe;
-            box-sizing: border-box;
-            width: 100%;
+            padding: 10px; border: 2px solid #eef2f7; border-radius: 10px; font-size: 0.95rem;
+            background-color: #fcfdfe; box-sizing: border-box; width: 100%;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-            font-family: inherit;
+        button.main-btn {
+            width: 100%; padding: 14px; background-color: var(--primary); color: white; border: none;
+            border-radius: 10px; font-size: 0.95rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(137, 207, 240, 0.25); transition: 0.2s; display: flex;
+            align-items: center; justify-content: center; gap: 8px;
         }
 
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            background-color: #fff;
-        }
-
-        button {
-            width: 100%;
-            padding: 16px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(137, 207, 240, 0.3);
+        button.main-btn:hover { background-color: var(--primary-dark); }
+        
+        button.secondary-btn {
+            width: 100%; padding: 10px; background-color: white; color: var(--primary-dark); border: 2px solid var(--primary);
+            border-radius: 10px; font-size: 0.85rem; font-weight: bold; cursor: pointer; margin-top: 10px;
             transition: 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        button:hover {
-            background-color: var(--primary-dark);
-        }
-
-        button:active {
-            transform: scale(0.98);
         }
 
         .result-panel {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 15px;
-            display: none;
-            text-align: center;
-            font-weight: 600;
+            margin-top: 15px; padding: 12px; border-radius: 12px; display: none;
+            text-align: center; font-weight: 600; font-size: 0.9rem;
         }
 
-        .deranged { background-color: #fff1f1; border: 2px solid var(--danger); color: #d63031; }
-        .normal { background-color: #f0fdf9; border: 2px solid #a2dad0; color: #2d3436; }
+        .deranged { background-color: #fff1f1; border: 1px solid var(--danger); color: #d63031; }
+        .normal { background-color: #f0fdf9; border: 1px solid #a2dad0; color: #2d3436; }
 
         .referral-output {
-            margin-top: 15px;
-            padding: 15px;
-            background: #fafafa;
-            border: 2px dashed #e0e0e0;
-            border-radius: 12px;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 0.9rem;
+            margin-top: 12px; padding: 12px; background: #fafafa; border: 1px dashed #e0e0e0;
+            border-radius: 10px; font-family: "Courier New", Courier, monospace; font-size: 0.85rem;
             white-space: pre-wrap;
-            position: relative;
         }
 
-        .ett-info {
-            background: #fdf6ff;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #efe1f5;
-            margin-top: 10px;
-            font-size: 0.85rem;
-            color: #6c5ce7;
-            line-height: 1.5;
+        .history-item {
+            background: #fff; border: 1px solid #eef2f7; padding: 10px; border-radius: 10px;
+            margin-bottom: 8px; font-size: 0.8rem; border-left: 4px solid var(--primary);
         }
 
-        .o2-settings {
-            background: #fffdf2;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #fef5d4;
-            margin-top: 10px;
-            display: none;
+        .external-box {
+            background: #f0f7ff; border: 1px solid var(--primary); padding: 12px;
+            border-radius: 12px; text-align: center; margin-bottom: 15px;
         }
 
-        /* Reference Table Styling */
-        .ref-card {
-            background: white;
-            width: 100%;
-            max-width: 500px;
-            padding: 24px;
-            border-radius: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
-            margin-top: 10px;
-            box-sizing: border-box;
+        .date-highlight {
+            font-size: 1.1rem; color: #2c3e50; font-weight: bold; display: inline-block;
+            margin: 5px 0; padding: 6px 12px; background: white; border-radius: 8px;
+            border: 2px solid var(--primary); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        /* Specific styling for the clickable height value */
+        .height-highlight {
+            font-weight: bold; color: var(--primary-dark); cursor: pointer; border-bottom: 1px dashed var(--primary-dark);
         }
 
-        .ref-table-container {
-            overflow-x: auto;
+        .iframe-container {
+            position: relative; width: 100%; height: 600px; border-radius: 12px;
+            overflow: hidden; border: 1px solid #ddd; background: #fff;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f8fbff;
-            color: var(--primary-dark);
-            padding: 8px;
-            border-bottom: 2px solid #eef2f7;
-        }
-
-        td {
-            padding: 8px;
-            border-bottom: 1px solid #f1f1f1;
-        }
-
-        tr:nth-child(even) {
-            background-color: #fafcfe;
-        }
-
-        .icon {
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-            vertical-align: middle;
-        }
+        iframe { width: 100%; height: 100%; border: none; }
 
         .toast {
-            position: fixed;
-            bottom: 20px;
-            background: #333;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 1000;
+            position: fixed; bottom: 30px; background: rgba(0,0,0,0.8); color: white;
+            padding: 12px 24px; border-radius: 25px; font-size: 0.85rem; opacity: 0;
+            transition: opacity 0.3s; pointer-events: none; z-index: 1000;
         }
+
+        .info-panel {
+            background: #fdf6ff; padding: 12px; border-radius: 10px; border: 1px solid #efe1f5;
+            margin-top: 20px; font-size: 0.8rem; color: #6c5ce7;
+        }
+
+        .hl-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .hl-table {
+            width: 100%; border-collapse: collapse; font-size: 0.7rem; color: #5a5a5a;
+            min-width: 500px;
+        }
+        .hl-table th, .hl-table td { border: 1px solid #efe1f5; padding: 6px 4px; text-align: center; }
+        .hl-table th { background: #f8f0ff; color: #6c5ce7; font-weight: bold; }
+        .hl-table tr:nth-child(even) { background-color: #faf7ff; }
+        .hl-table .row-label { text-align: left; font-weight: bold; background: #fdf6ff; padding-left: 8px; }
+
+        .o2-row {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #fcfcfc;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #eef2f7;
+            grid-column: span 2;
+        }
+
+        .o2-controls { display: flex; gap: 8px; }
+
+        .extra-settings {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #eef2f7;
+        }
+
+        .footer-references {
+            margin-top: 30px; padding: 20px; border-top: 1px solid #eef2f7;
+            width: 100%; max-width: 650px; font-size: 0.75rem; color: #a0a0a0;
+            text-align: center; line-height: 1.4;
+        }
+        
+        .footer-references a { color: var(--primary-dark); text-decoration: none; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h1>
-        <svg class="icon" viewBox="0 0 24 24" style="width:28px; height:28px;"><path d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M12,20c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8 S16.41,20,12,20z M13,7h-2v4H7v2h4v4h2v-4h4v-2h-4V7z"/></svg>
-        Pediatric Vitals Checker
-    </h1>
+<div class="tabs">
+    <button class="tab-btn active" id="btn-vitals" onclick="switchTab('vitals')">Vitals Checker</button>
+    <button class="tab-btn" id="btn-history" onclick="switchTab('history')">History</button>
+    <button class="tab-btn" id="btn-bp" onclick="switchTab('bp-calc')">AHA BP (Pedz.de)</button>
+</div>
+
+<div id="vitals-tab" class="tab-content active card">
+    <h1>Vitals Checker</h1>
 
     <div class="input-group">
-        <label>
-            <svg class="icon" style="color:var(--primary-dark);" viewBox="0 0 24 24"><path d="M15,14C12.33,14,7,15.33,7,18v2H23V18C23,15.33,17.67,14,15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/></svg>
-            Patient Name List (one per line)
-        </label>
-        <textarea id="nameList" placeholder="Juan dela Cruz&#10;Maria dela Cruz" oninput="updateNameDropdown()"></textarea>
+        <label>Name List (one per line or comma separated)</label>
+        <textarea id="nameList" placeholder="Name 1, Name 2" oninput="updateNameDropdown()" style="height: 60px;"></textarea>
     </div>
 
-    <div class="input-group" style="margin-top:15px;">
-        <label>Select Patient Name</label>
-        <select id="pNameDropdown">
-            <option value="">-- Select or type below --</option>
-        </select>
-        <input type="text" id="pNameManual" placeholder="Or type manually..." style="margin-top:5px;">
-    </div>
-
-    <div class="grid" style="margin-top:15px;">
+    <div class="grid" style="margin-top: 10px;">
         <div class="input-group">
-            <label>
-                <svg class="icon" viewBox="0 0 24 24"><path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/></svg>
-                Age Category
-            </label>
-            <select id="ageRange" onchange="handleAgeChange()">
-                <option value="" disabled selected>Select age category</option>
-                <option value="premie">Premie</option>
-                <option value="0-3mo">0-3 months</option>
-                <option value="3-6mo">3-6 months</option>
-                <option value="6-12mo">6-12 months</option>
-                <option value="1-3yr">1-3 years</option>
-                <option value="3-6yr">3-6 years</option>
-                <option value="6-12yr">6-12 years</option>
-                <option value=">12yr">>12 years</option>
-            </select>
+            <label>Select Name</label>
+            <select id="pNameDropdown"><option value="">-- Select --</option></select>
         </div>
-        <div class="input-group" id="exactAgeContainer" style="display:none;">
-            <label>Exact Age (Years)</label>
-            <input type="number" id="exactAge" placeholder="For ETT" step="0.5">
+        <div class="input-group">
+            <label>Manual Name</label>
+            <input type="text" id="pNameManual" placeholder="...">
         </div>
     </div>
 
-    <div class="section-title">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.41,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.59,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg>
-        Current Vitals
-    </div>
+    <div class="section-title">Age & Height</div>
     <div class="grid">
+        <div class="input-group"><label>Years</label><input type="number" id="ageYears" value="0" oninput="handleAgeChange()"></div>
+        <div class="input-group"><label>Months</label><input type="number" id="ageMonths" value="0" max="11" oninput="handleAgeChange()"></div>
+        <div class="input-group"><label>Height (cm)</label><input type="number" id="pHeight" value="100" oninput="updateBPDisplay()"></div>
         <div class="input-group">
-            <label>HR (bpm)</label>
-            <input type="number" id="vHR" placeholder="0">
+            <label>Sex</label>
+            <select id="pSex"><option value="male">Male</option><option value="female">Female</option></select>
         </div>
+    </div>
+
+    <div class="section-title">Current Vitals</div>
+    <div class="grid">
+        <div class="input-group"><label>HR</label><input type="number" id="vHR"></div>
+        <div class="input-group"><label>RR</label><input type="number" id="vRR"></div>
+        <div class="input-group"><label>SBP</label><input type="number" id="vSBP"></div>
+        <div class="input-group"><label>DBP</label><input type="number" id="vDBP"></div>
+        <div class="input-group"><label>T (°C)</label><input type="number" step="0.1" id="vTemp" value="37.0"></div>
         <div class="input-group">
-            <label>RR (bpm)</label>
-            <input type="number" id="vRR" placeholder="0">
-        </div>
-        <div class="input-group">
-            <label>Systolic BP</label>
-            <input type="number" id="vSBP" placeholder="0">
-        </div>
-        <div class="input-group">
-            <label>Diastolic BP</label>
-            <input type="number" id="vDBP" placeholder="0">
-        </div>
-        <div class="input-group">
-            <label>Temp (°C)</label>
-            <input type="number" step="0.1" id="vTemp" value="37.0">
-        </div>
-        <div class="input-group">
-            <label>O2 Sat (%)</label>
+            <label>O2 (%)</label>
             <input type="number" id="vO2" value="98">
         </div>
+
+        <div class="o2-row">
+            <label>O2 Source & Settings</label>
+            <div class="o2-controls">
+                <select id="vO2Source" onchange="toggleO2Fields()">
+                    <option value="RA">RA</option>
+                    <option value="NC">NC</option>
+                    <option value="NRFM">NRFM</option>
+                    <option value="HFNC">HFNC</option>
+                    <option value="BIPAP">BIPAP</option>
+                    <option value="SPONT">SPONT</option>
+                    <option value="SIMV">SIMV</option>
+                    <option value="AC">AC</option>
+                </select>
+                <input type="text" id="vO2ModeDetail" placeholder="Mode Details (e.g. PIP/Set Rate)" style="flex: 1;">
+            </div>
+            
+            <div id="extraO2Fields" class="extra-settings" style="display: none;">
+                <div id="lpmContainer" style="display: none;">
+                    <label>LPM</label>
+                    <input type="number" id="vLPM" step="0.5" placeholder="LPM">
+                </div>
+                <div id="fio2Container" style="display: none;">
+                    <label>FiO2 %</label>
+                    <input type="number" id="vFiO2" placeholder="%">
+                </div>
+                <div id="peepContainer" style="display: none;">
+                    <label>PEEP</label>
+                    <input type="number" id="vPEEP" placeholder="PEEP">
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="section-title">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z"/></svg>
-        Oxygen Support
-    </div>
+    <div class="section-title">BP Classification (Override)</div>
     <div class="input-group">
-        <label>Delivery Method</label>
-        <select id="o2Method" onchange="toggleO2Settings()">
-            <option value="RA">RA (Room Air)</option>
-            <option value="NC">NC (Nasal Cannula)</option>
-            <option value="FM">FM (Face Mask)</option>
-            <option value="NRFM">NRFM (Non-rebreather Mask)</option>
-            <option value="HFNC">HFNC (High Flow Nasal Cannula)</option>
-            <option value="SPONT">SPONT (Ventilator - Spontaneous)</option>
-            <option value="SIMV">SIMV (Ventilator - SIMV)</option>
-            <option value="LC">LC (Ventilator - Low Compliance)</option>
-            <option value="A/C">A/C (Ventilator - Assist Control)</option>
+        <label>Classify BP status (based on AHA/Pedz)</label>
+        <select id="bpOverride">
+            <option value="">Auto-calculate</option>
+            <option value="hypertension">Hypertension</option>
+            <option value="hypotension">Hypotension</option>
+            <option value="normal">Normal</option>
         </select>
     </div>
 
-    <div id="lpmContainer" class="o2-settings">
-        <div class="input-group">
-            <label>Flow Rate (LPM)</label>
-            <input type="number" id="vLPM" placeholder="e.g. 2.0" step="0.5">
-        </div>
-    </div>
-
-    <div id="ventContainer" class="o2-settings">
-        <div class="grid">
-            <div class="input-group">
-                <label>FiO2 (%)</label>
-                <input type="number" id="vFiO2" placeholder="FiO2">
-            </div>
-            <div class="input-group">
-                <label>PEEP (cmH2O)</label>
-                <input type="number" id="vPEEP" placeholder="PEEP">
-            </div>
-        </div>
-    </div>
-
-    <button onclick="analyze()">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M10,17l-5-5l1.41-1.41L10,14.17l7.59-7.59L19,8L10,17z"/></svg>
-        Check Vitals & Calculate
-    </button>
+    <button class="main-btn" onclick="analyze()">Check Vitals</button>
 
     <div id="resultPanel" class="result-panel"></div>
-    <div id="ettPanel" class="ett-info" style="display:none;"></div>
-
+    
     <div id="referralContainer" style="display:none;">
         <div class="section-title">Referral Message</div>
         <div class="referral-output" id="referralText"></div>
-        <button onclick="copyText()" style="padding: 10px; margin-top: 10px;">Copy Message</button>
+        <div class="grid">
+            <button class="main-btn" onclick="copyReferral()">Copy Message</button>
+            <button class="secondary-btn" onclick="saveToHistory()">Save to History</button>
+        </div>
+    </div>
+
+    <div id="hlPanel" class="info-panel">
+        <div style="font-weight:bold; margin-bottom:5px; color: #6c5ce7; font-size: 0.85rem;">Pediatric Parameters & Equipment Reference (PALS/JH):</div>
+        <div class="hl-table-wrapper">
+            <table class="hl-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Newborn</th>
+                        <th>6 mo</th>
+                        <th>1 yr</th>
+                        <th>2-3 yr</th>
+                        <th>4-6 yr</th>
+                        <th>7-10 yr</th>
+                        <th>11-15 yr</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="row-label">HR (bpm)</td><td>100-150</td><td>90-120</td><td>80-120</td><td>70-110</td><td>65-110</td><td>60-95</td><td>55-85</td></tr>
+                    <tr><td class="row-label">RR (bpm)</td><td>35-55</td><td>30-45</td><td>25-40</td><td>20-30</td><td>20-25</td><td>14-22</td><td>12-18</td></tr>
+                    <tr><td class="row-label">SBP (mmHg)</td><td>65-85</td><td>70-90</td><td>80-100</td><td>90-105</td><td>95-110</td><td>100-120</td><td>110-135</td></tr>
+                    <tr><td class="row-label">DBP (mmHg)</td><td>45-55</td><td>50-65</td><td>55-65</td><td>55-70</td><td>60-75</td><td>60-75</td><td>65-85</td></tr>
+                    <tr><td class="row-label">WT (kg)</td><td>2-4</td><td>6-8</td><td>10</td><td>12-16</td><td>20-25</td><td>25-35</td><td>40-50</td></tr>
+                    <tr><td class="row-label">ETT Size</td><td>3.0-3.5</td><td>3.5</td><td>4.0</td><td>4.0-4.5</td><td>4.5-5.0</td><td>5.5-6.0</td><td>6.0-6.5</td></tr>
+                    <tr><td class="row-label">Blade</td><td>MIL 0</td><td>MIL 1</td><td>MIL 1/MAC 2</td><td>MIL 1/MAC 2</td><td>MIL 2/MAC 2</td><td>MIL 2/MAC 2</td><td>MIL 2/MAC 3</td></tr>
+                    <tr><td class="row-label">IV Cath (ga)</td><td>22-24</td><td>20-24</td><td>20-24</td><td>18-22</td><td>18-22</td><td>18-22</td><td>18-20</td></tr>
+                    <tr><td class="row-label">NGT (Fr)</td><td>5-8</td><td>8</td><td>10</td><td>10-12</td><td>12-14</td><td>12-14</td><td>14-18</td></tr>
+                    <tr><td class="row-label">Foley (Fr)</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>8</td><td>10</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<div class="ref-card">
-    <div class="section-title">
-        <svg class="icon" viewBox="0 0 24 24"><path d="M19,3H5C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H19C20.11,21 21,20.11 21,19V5C21,3.89 20.11,3 19,3M19,19H5V5H19V19M7,10H17V12H7V10M7,6H17V8H7V6M7,14H12V16H7V14Z"/></svg>
-        Reference Normal Ranges
+<div id="history-tab" class="tab-content card">
+    <h1>Patient History</h1>
+    <div id="historyList">
+        <p style="text-align:center; color:#a0a0a0; font-size:0.9rem;">No saved records for this session.</p>
     </div>
-    <div class="ref-table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Age</th>
-                    <th>HR</th>
-                    <th>RR</th>
-                    <th>SBP</th>
-                    <th>DBP</th>
-                </tr>
-            </thead>
-            <tbody id="refTableBody"></tbody>
-        </table>
+    <button class="secondary-btn" style="color:#d63031; border-color:#ff9999;" onclick="clearHistory()">Clear All</button>
+</div>
+
+<div id="bp-tab" class="tab-content card">
+    <div class="bp-header"><h1>BP Reference (AHA)</h1></div>
+    <div class="external-box">
+        <p style="font-size: 0.8rem; color: #555; margin: 0;">Tap values to copy for Pedz.de:</p>
+        <div id="birthDateDisplay" class="date-highlight" onclick="copyBirthDate()">01.01.2024</div>
+        <p style="font-size: 0.9rem; margin-top: 5px;">Height: <span id="heightDisplay" class="height-highlight" onclick="copyHeightValue()">100</span> cm</p>
+    </div>
+    <div class="iframe-container">
+        <iframe id="pedzFrame" src="https://www.pedz.de/de/pedz/bp.html?mobile=1&data=aha"></iframe>
     </div>
 </div>
 
-<div id="toast" class="toast">Referral copied!</div>
+<div class="footer-references">
+    <strong>References:</strong><br>
+    Hunt EA, et al. The Johns Hopkins Children's Center Kids Kard, 2021.<br>
+    <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11499298/" target="_blank">PALS Vital Signs Reference (PMC11499298)</a><br>
+    American Heart Association (AHA) Pediatric Blood Pressure Guidelines.
+</div>
+
+<div id="toast" class="toast">Copied!</div>
 
 <script>
-    const vitalRanges = {
-        "premie": { label: "Premie", hr: [120, 170], rr: [40, 70], sbp: [55, 75], dbp: [35, 45] },
-        "0-3mo":  { label: "0-3 mo", hr: [100, 150], rr: [35, 55], sbp: [65, 85], dbp: [45, 55] },
-        "3-6mo":  { label: "3-6 mo", hr: [90, 120],  rr: [30, 45], sbp: [70, 90], dbp: [50, 65] },
-        "6-12mo": { label: "6-12 mo", hr: [80, 120],  rr: [25, 40], sbp: [80, 100], dbp: [55, 65] },
-        "1-3yr":  { label: "1-3 yr", hr: [70, 110],  rr: [20, 30], sbp: [90, 105], dbp: [55, 70] },
-        "3-6yr":  { label: "3-6 yr", hr: [65, 110],  rr: [20, 25], sbp: [95, 110], dbp: [60, 75] },
-        "6-12yr": { label: "6-12 yr", hr: [60, 95],   rr: [14, 22], sbp: [100, 120], dbp: [60, 75] },
-        ">12yr":  { label: ">12 yr", hr: [55, 85],   rr: [12, 18], sbp: [110, 135], dbp: [65, 85] }
-    };
+    // Internal state
+    let patientHistory = [];
+    let calculatedDateStr = "";
 
-    const tbody = document.getElementById('refTableBody');
-    Object.values(vitalRanges).forEach(range => {
-        const row = `<tr>
-            <td><strong>${range.label}</strong></td>
-            <td>${range.hr[0]} - ${range.hr[1]}</td>
-            <td>${range.rr[0]} - ${range.rr[1]}</td>
-            <td>${range.sbp[0]} - ${range.sbp[1]}</td>
-            <td>${range.dbp[0]} - ${range.dbp[1]}</td>
-        </tr>`;
-        tbody.innerHTML += row;
-    });
+    const vitalRanges = [
+        { key: "0-3mo", hr: [100, 150], rr: [35, 55], sbp: [65, 85], dbp: [45, 55], maxMonths: 3 },
+        { key: "3-6mo", hr: [90, 120], rr: [30, 45], sbp: [70, 90], dbp: [50, 65], maxMonths: 6 },
+        { key: "6-12mo", hr: [80, 120], rr: [25, 40], sbp: [80, 100], dbp: [55, 65], maxMonths: 12 },
+        { key: "1-3yr", hr: [70, 110], rr: [20, 30], sbp: [90, 105], dbp: [55, 70], maxMonths: 36 },
+        { key: "3-6yr", hr: [65, 110], rr: [20, 25], sbp: [95, 110], dbp: [60, 75], maxMonths: 72 },
+        { key: "6-12yr", hr: [60, 95], rr: [14, 22], sbp: [100, 120], dbp: [60, 75], maxMonths: 144 },
+        { key: ">12yr", hr: [55, 85], rr: [12, 18], sbp: [110, 135], dbp: [65, 85], maxMonths: Infinity }
+    ];
+
+    function toggleO2Fields() {
+        const src = document.getElementById('vO2Source').value;
+        const extraRow = document.getElementById('extraO2Fields');
+        const lpmCont = document.getElementById('lpmContainer');
+        const fio2Cont = document.getElementById('fio2Container');
+        const peepCont = document.getElementById('peepContainer');
+        const modeInput = document.getElementById('vO2ModeDetail');
+
+        const isLpmMode = ["NC", "NRFM", "HFNC"].includes(src);
+        const isMVMode = ["BIPAP", "SIMV", "AC", "SPONT"].includes(src);
+
+        extraRow.style.display = (isLpmMode || isMVMode) ? 'grid' : 'none';
+        lpmCont.style.display = isLpmMode ? 'block' : 'none';
+        fio2Cont.style.display = isMVMode ? 'block' : 'none';
+        peepCont.style.display = isMVMode ? 'block' : 'none';
+
+        if (isMVMode && src !== "SPONT") {
+            modeInput.placeholder = "Set Rate/PIP";
+        } else if (src === "SPONT") {
+            modeInput.placeholder = "Support Level/Mode";
+        } else {
+            modeInput.placeholder = "Mode Details";
+        }
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        if(tab === 'vitals') {
+            document.getElementById('btn-vitals').classList.add('active');
+            document.getElementById('vitals-tab').classList.add('active');
+        } else if (tab === 'history') {
+            document.getElementById('btn-history').classList.add('active');
+            document.getElementById('history-tab').classList.add('active');
+            renderHistory();
+        } else {
+            document.getElementById('btn-bp').classList.add('active');
+            document.getElementById('bp-tab').classList.add('active');
+            updateBPDisplay();
+        }
+    }
+
+    function updateBPDisplay() {
+        document.getElementById('heightDisplay').innerText = (document.getElementById('pHeight').value || "100");
+        updateCalculatedBirthDate();
+    }
 
     function updateNameDropdown() {
         const text = document.getElementById('nameList').value;
         const dropdown = document.getElementById('pNameDropdown');
-        const names = text.split('\n').map(n => n.trim()).filter(n => n !== "");
-        const currentVal = dropdown.value;
+        const names = text.split(/[,\n]/).map(n => n.trim()).filter(n => n !== "");
         dropdown.innerHTML = '<option value="">-- Select Name --</option>';
         names.forEach(name => {
             const opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = name;
-            dropdown.appendChild(opt);
+            opt.value = name; opt.textContent = name; dropdown.appendChild(opt);
         });
-        if (names.includes(currentVal)) dropdown.value = currentVal;
     }
 
     function handleAgeChange() {
-        const val = document.getElementById('ageRange').value;
-        const container = document.getElementById('exactAgeContainer');
-        container.style.display = val.includes('yr') ? 'block' : 'none';
-        const ref = vitalRanges[val];
-        if (ref) {
-            document.getElementById('vHR').value = Math.round((ref.hr[0] + ref.hr[1]) / 2);
-            document.getElementById('vRR').value = Math.round((ref.rr[0] + ref.rr[1]) / 2);
-            document.getElementById('vSBP').value = Math.round((ref.sbp[0] + ref.sbp[1]) / 2);
-            document.getElementById('vDBP').value = Math.round((ref.dbp[0] + ref.dbp[1]) / 2);
+        const y = parseInt(document.getElementById('ageYears').value) || 0;
+        const m = parseInt(document.getElementById('ageMonths').value) || 0;
+        const total = (y * 12) + m;
+        const r = vitalRanges.find(range => total <= range.maxMonths) || vitalRanges[vitalRanges.length-1];
+        if(r) {
+            document.getElementById('vHR').value = Math.round((r.hr[0]+r.hr[1])/2);
+            document.getElementById('vRR').value = Math.round((r.rr[0]+r.rr[1])/2);
+            document.getElementById('vSBP').value = Math.round((r.sbp[0]+r.sbp[1])/2);
+            document.getElementById('vDBP').value = Math.round((r.dbp[0]+r.dbp[1])/2);
         }
+        updateCalculatedBirthDate();
     }
 
-    function toggleO2Settings() {
-        const method = document.getElementById('o2Method').value;
-        const lpmCont = document.getElementById('lpmContainer');
-        const ventCont = document.getElementById('ventContainer');
-        lpmCont.style.display = ['NC', 'FM', 'NRFM', 'HFNC'].includes(method) ? 'block' : 'none';
-        ventCont.style.display = ['SPONT', 'SIMV', 'LC', 'A/C'].includes(method) ? 'block' : 'none';
+    function updateCalculatedBirthDate() {
+        const total = (parseInt(document.getElementById('ageYears').value)||0)*12 + (parseInt(document.getElementById('ageMonths').value)||0);
+        const d = new Date(); d.setMonth(d.getMonth() - total);
+        calculatedDateStr = `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+        document.getElementById('birthDateDisplay').innerText = calculatedDateStr;
     }
 
     function analyze() {
-        const dName = document.getElementById('pNameDropdown').value;
-        const mName = document.getElementById('pNameManual').value;
-        const name = dName || mName || "NAME";
-        const ageCat = document.getElementById('ageRange').value;
-        if (!ageCat) { showToast("Select age category."); return; }
-
+        const name = document.getElementById('pNameDropdown').value || document.getElementById('pNameManual').value || "PATIENT";
         const hr = parseInt(document.getElementById('vHR').value);
         const rr = parseInt(document.getElementById('vRR').value);
         const sbp = parseInt(document.getElementById('vSBP').value);
         const dbp = parseInt(document.getElementById('vDBP').value);
-        const temp = parseFloat(document.getElementById('vTemp').value);
+        const tempValue = parseFloat(document.getElementById('vTemp').value);
         const o2sat = parseInt(document.getElementById('vO2').value);
-        const exactAge = parseFloat(document.getElementById('exactAge').value);
-        const o2Method = document.getElementById('o2Method').value;
+        const o2src = document.getElementById('vO2Source').value;
+        const o2modeDetail = document.getElementById('vO2ModeDetail').value;
         const lpm = document.getElementById('vLPM').value;
         const fio2 = document.getElementById('vFiO2').value;
         const peep = document.getElementById('vPEEP').value;
+        const bpOverride = document.getElementById('bpOverride').value;
 
-        let supportStr = o2Method; // Default to the method name (e.g., "RA")
-        if (['NC', 'FM', 'NRFM', 'HFNC'].includes(o2Method) && lpm) {
-            supportStr = `${o2Method} ${lpm} lpm`;
-        } else if (['SPONT', 'SIMV', 'LC', 'A/C'].includes(o2Method)) {
-            supportStr = `${o2Method} ${fio2 || '--'}/${peep || '--'}`;
-        }
+        const y = parseInt(document.getElementById('ageYears').value)||0;
+        const m = parseInt(document.getElementById('ageMonths').value)||0;
+        const totalMonths = (y * 12) + m;
+        const ref = vitalRanges.find(range => totalMonths <= range.maxMonths) || vitalRanges[vitalRanges.length-1];
 
-        const ref = vitalRanges[ageCat];
         let issues = [];
-        if (hr > ref.hr[1]) issues.push("tachycardia");
-        if (hr < ref.hr[0]) issues.push("bradycardia");
-        if (rr > ref.rr[1]) issues.push("tachypnea");
-        if (rr < ref.rr[0]) issues.push("bradypnea");
-        if (sbp > ref.sbp[1]) issues.push("hypertension");
-        if (sbp < ref.sbp[0]) issues.push("hypotension");
-        if (temp >= 37.7) issues.push("fever");
-        if (o2sat < 95) issues.push("desaturations");
 
-        const resultPanel = document.getElementById('resultPanel');
-        resultPanel.style.display = "block";
+        const checkVital = (label, value, range, issueUp, issueDown) => {
+            const isHigh = value > range[1];
+            const isLow = value < range[0];
+            const isDeranged = isHigh || isLow;
+            if (isHigh) issues.push(issueUp);
+            if (isLow) issues.push(issueDown);
+            return { label, value, isDeranged, text: `${label} ${value}${isDeranged ? '❗️' : ''}` };
+        };
 
-        if (issues.length > 0) {
-            resultPanel.className = "result-panel deranged";
-            resultPanel.innerHTML = `⚠️ Deranged: ${issues.join(", ")}`;
-            document.getElementById('referralContainer').style.display = 'block';
-
-            const lines = [
-                { label: "HR", val: hr, deranged: (hr > ref.hr[1] || hr < ref.hr[0]) },
-                { label: "RR", val: rr, deranged: (rr > ref.rr[1] || rr < ref.rr[0]) },
-                { label: "BP", val: `${sbp}/${dbp}`, deranged: (sbp < ref.sbp[0] || sbp > ref.sbp[1]) },
-                { label: "T", val: temp || '37', deranged: (temp >= 37.7) },
-                { label: "O2", val: `${o2sat} ${supportStr}`.trim(), deranged: (o2sat < 95) }
-            ];
-
-            const formattedVitals = lines.map(l => `${l.label} ${l.val}${l.deranged ? '❗️' : ''}`).join('\n');
-            
-            document.getElementById('referralText').innerText = `Respectfully referring ${name.toUpperCase()} for ${issues.join(", ")}
-
-${formattedVitals}
-
-Thank you po!`;
-        } else {
-            resultPanel.className = "result-panel normal";
-            resultPanel.innerHTML = `✅ Vitals normal for ${ageCat}`;
-            document.getElementById('referralContainer').style.display = 'none';
+        const hrObj = checkVital("HR", hr, ref.hr, "tachycardia", "bradycardia");
+        const rrObj = checkVital("RR", rr, ref.rr, "tachypnea", "bradypnea");
+        
+        let bpDeranged = false;
+        if (bpOverride === "hypertension") { issues.push("hypertension"); bpDeranged = true; }
+        else if (bpOverride === "hypotension") { issues.push("hypotension"); bpDeranged = true; }
+        else if (bpOverride === "normal") { bpDeranged = false; }
+        else {
+            if (sbp > ref.sbp[1]) { issues.push("hypertension"); bpDeranged = true; }
+            else if (sbp < ref.sbp[0]) { issues.push("hypotension"); bpDeranged = true; }
         }
+        const bpObj = { text: `BP ${sbp}/${dbp}${bpDeranged ? '❗️' : ''}`, isDeranged: bpDeranged };
+        
+        const isFever = tempValue >= 37.7;
+        if (isFever) issues.push("fever");
+        const tObj = { text: `T ${tempValue.toFixed(1)}${isFever ? '❗️' : ''}`, isDeranged: isFever };
 
-        const ettPanel = document.getElementById('ettPanel');
-        if (!isNaN(exactAge) && exactAge >= 1) {
-            ettPanel.style.display = "block";
-            ettPanel.innerHTML = `<strong>ETT Estimation:</strong><br>
-                Uncuffed: ${((exactAge / 4) + 4).toFixed(1)} mm<br>
-                Cuffed: ${((exactAge / 4) + 3).toFixed(1)} mm<br>
-                Depth: ${(((exactAge / 4) + 4) * 3).toFixed(1)} cm`;
-        } else ettPanel.style.display = "none";
+        const isDesat = o2sat < 95;
+        if (isDesat) issues.push("desaturations");
+        
+        let o2DetailStr = `O2 ${o2sat}%`;
+        if (o2src !== "RA") {
+            o2DetailStr += ` ${o2src}`;
+            if (o2modeDetail) o2DetailStr += ` (${o2modeDetail})`;
+            if (["NC", "NRFM", "HFNC"].includes(o2src) && lpm) o2DetailStr += ` @ ${lpm}lpm`;
+            if (["BIPAP", "SIMV", "AC", "SPONT"].includes(o2src)) {
+                if (fio2) o2DetailStr += ` FiO2 ${fio2}%`;
+                if (peep) o2DetailStr += ` PEEP ${peep}`;
+            }
+        } else { o2DetailStr += ` RA`; }
+        const o2Obj = { text: `${o2DetailStr}${isDesat ? '❗️' : ''}`, isDeranged: isDesat };
+
+        const allVitals = [hrObj, rrObj, bpObj, tObj, o2Obj];
+        const derangedVitals = allVitals.filter(v => v.isDeranged);
+        const stableVitals = allVitals.filter(v => !v.isDeranged);
+        const vitalLines = [...derangedVitals, ...stableVitals].map(v => v.text);
+
+        document.getElementById('resultPanel').style.display = "block";
+        document.getElementById('resultPanel').className = issues.length ? "result-panel deranged" : "result-panel normal";
+        document.getElementById('resultPanel').innerText = issues.length ? `Deranged: ${issues.join(", ")}` : "Vitals normal for age";
+
+        document.getElementById('referralContainer').style.display = 'block';
+        const referralHeader = issues.length 
+            ? `Respectfully referring ${name.toUpperCase()} for ${issues.join(", ")}`
+            : `Respectfully relaying latest vitals of ${name.toUpperCase()}`;
+            
+        document.getElementById('referralText').innerText = `${referralHeader}\n\n${vitalLines.join('\n')}\n\nThank you po!`;
     }
 
-    function showToast(msg) {
-        const toast = document.getElementById('toast');
-        toast.innerText = msg;
-        toast.style.opacity = "1";
-        setTimeout(() => toast.style.opacity = "0", 2500);
+    function saveToHistory() {
+        const name = document.getElementById('pNameDropdown').value || document.getElementById('pNameManual').value || "Unknown";
+        const referralText = document.getElementById('referralText').innerText;
+        const timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        patientHistory.unshift({ name, referralText, timestamp });
+        showToast("Saved to history!");
     }
 
-    function copyText() {
-        const text = document.getElementById('referralText').innerText;
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try { document.execCommand('copy'); showToast("Referral copied!"); } 
-        catch (err) { showToast("Failed to copy"); }
-        document.body.removeChild(textArea);
+    function renderHistory() {
+        const container = document.getElementById('historyList');
+        if (patientHistory.length === 0) {
+            container.innerHTML = '<p style="text-align:center; color:#a0a0a0; font-size:0.9rem;">No saved records for this session.</p>';
+            return;
+        }
+        container.innerHTML = patientHistory.map((item, index) => `
+            <div class="history-item">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <strong>${item.name}</strong>
+                    <span style="color:#a0a0a0;">${item.timestamp}</span>
+                </div>
+                <div style="white-space:pre-wrap; font-size:0.75rem; color:#666;">${item.referralText}</div>
+                <button class="secondary-btn" style="padding:4px; margin-top:5px; font-size:0.7rem;" onclick="copyToClipboard(patientHistory[${index}].referralText, 'Referral copied!')">Copy Again</button>
+            </div>
+        `).join('');
     }
+
+    function clearHistory() {
+        patientHistory = [];
+        renderHistory();
+        showToast("History cleared");
+    }
+
+    function showToast(m) {
+        const t = document.getElementById('toast'); t.innerText = m; t.style.opacity = "1";
+        setTimeout(() => t.style.opacity = "0", 2000);
+    }
+
+    function copyToClipboard(t, m) {
+        const el = document.createElement("textarea"); el.value = t; document.body.appendChild(el); el.select();
+        document.execCommand('copy'); document.body.removeChild(el); showToast(m);
+    }
+
+    function copyReferral() { copyToClipboard(document.getElementById('referralText').innerText, "Referral copied!"); }
+    function copyBirthDate() { copyToClipboard(calculatedDateStr, "Birth date copied!"); }
+    function copyHeightValue() { copyToClipboard(document.getElementById('pHeight').value || "100", "Height copied!"); }
+
+    window.onload = handleAgeChange;
 </script>
-
 </body>
 </html>
